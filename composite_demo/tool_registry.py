@@ -133,6 +133,42 @@ def get_shell(
         return e.stderr
 
 
+@register_tool
+def get_current_time(hours: Annotated[int, '相对GMT的时间差，单位小时', True]):
+    """
+    获取当前服务器时间
+    """
+    import time
+    return time.localtime()
+
+@register_tool
+def get_device_oee(deviceId: Annotated[str, '设备编号', True]):
+    """
+    获取设备OEE
+    """
+    import random
+    return str(round(random.random() * 100)) + '%'
+
+
+@register_tool
+def get_schema_list():
+    """
+    获取schema列表
+    """
+    import requests
+    try:
+        resp = requests.get(f"http://192.168.1.23:32586/api/v2/phegda-platform/schema/config/list?pageNumber=1&pageSize=10")
+        resp.raise_for_status()
+        resp = resp.json()
+        schema_list = resp['data']['items']
+        ret = [item['schemaName'] for item in schema_list]
+    except:
+        import traceback
+        ret = "Error encountered while fetching schema data!\n" + traceback.format_exc()
+
+    return str(ret)
+
+
 if __name__ == "__main__":
     # print(dispatch_tool("get_shell", {"query": "pwd"}))
     print(get_tools())
